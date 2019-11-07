@@ -50,7 +50,9 @@ class DetectedObjects(TLVType):
 				self.Z = objTuple[5]*1.0/(1 << xyzQFormat)
 				self.Range = math.sqrt(pow(self.X, 2) + pow(self.Y, 2))
 			except Exception as e:
-				raise ParseError('Could not parse object with tuple {}: {}'.format(objTuple, e))
+				raise ParseError(
+					'Could not parse object with tuple {}: {}'.format(
+						objTuple, e))
 
 	def __init__(self, data):
 		self.objects = []
@@ -70,7 +72,9 @@ class DetectedObjects(TLVType):
 			# as their header indicates is contained in the TLV content.
 			# There should be no data left in the buffer after they have parsed
 			# all the content.
-			raise ParseError("Received more data than expected. Indicates earlier parsing error.")
+			raise ParseError(
+				'Received more data than expected. '
+				'Indicates earlier parsing error.')
 
 	def __str__(self):
 		result = "\tDetect Obj:\t%d\n"%(self.numDetectedObj) 
@@ -124,7 +128,7 @@ class Stats(TLVType):
 
 class TLV(object):
 	"""Class to parse and save a TLV header and content.
-		Each Parse method returns the remaining buffer, without the parsed content.
+		Parse methods return the remaining buffer without the parsed content.
 		Usage:
 			tlv = TLV()
 			data = tlv.ParseHeader(data)
@@ -140,10 +144,12 @@ class TLV(object):
 			Returns remaining (post-header) data.
 		"""
 		try:
-			self.header = TLVHeader(*struct.unpack('2I', data[:TLV_HEADER_BYTES]))
+			self.header = TLVHeader(
+				*struct.unpack('2I', data[:TLV_HEADER_BYTES]))
 			return data[TLV_HEADER_BYTES:]
 		except:
-			raise ParseError('Improper TLV header: {}'.format(data[:TLV_HEADER_BYTES]))
+			raise ParseError(
+				'Improper TLV header: {}'.format(data[:TLV_HEADER_BYTES]))
 
 	def ParseContents(self, data):
 		"""Parses TLV objects from start of data, according to self.header.type.
@@ -170,7 +176,7 @@ class TLV(object):
 
 class Frame(object):
 	"""Class to parse and save a Frame and its TLVs.
-		Each Parse method returns the remaining buffer, without the parsed content.
+		Parse methods return the remaining buffer, without the parsed content.
 		Usage:
 			frame = Frame()
 			data = frame.ParseHeader(data)
@@ -186,11 +192,13 @@ class Frame(object):
 			Returns remaining (post-header) data.
 		"""
 		try:
-			self.header = FrameHeader(*struct.unpack('Q7I', data[:FRAME_HEADER_BYTES]))
+			self.header = FrameHeader(
+				*struct.unpack('Q7I', data[:FRAME_HEADER_BYTES]))
 			return data[FRAME_HEADER_BYTES:]
 
 		except:
-			raise ParseError('Improper Frame header: {}'.format(data[:FRAME_HEADER_BYTES]))
+			raise ParseError(
+				'Improper Frame header: {}'.format(data[:FRAME_HEADER_BYTES]))
 
 	def ParseTLVs(self, data):
 		"""Parses self.header.numTLV TLV's from start of data.
